@@ -35,7 +35,7 @@ ClaySettings settings;
 
 // Initialize the default settings
 static void prv_default_settings() {
-  settings.Bluetooth = false;
+  settings.Bluetooth = true;
   settings.Animations = false;
 }
 

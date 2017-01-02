@@ -18,7 +18,7 @@ module.exports = [
         "type": "toggle",
         "messageKey": "Bluetooth",
         "label": "Enable Bluetooth Status",
-        "defaultValue": false
+        "defaultValue": true
       },
       {
         "type": "toggle",
