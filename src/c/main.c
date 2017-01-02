@@ -170,8 +170,8 @@ static void update_time() {
 static void set_text_to_window() {
 
   //Time TextLayer 
-  s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CRYSTAL_36));
-  s_time_layer = text_layer_create(GRect(5, 50, 130, 40));
+  s_time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CRYSTAL_48));
+  s_time_layer = text_layer_create(GRect(25, 50, 130, 50));
   text_layer_set_background_color(s_time_layer, GColorClear);
   text_layer_set_text_color(s_time_layer, GColorWhite);
   text_layer_set_text(s_time_layer, "00:00");
@@ -179,8 +179,8 @@ static void set_text_to_window() {
   text_layer_set_text_alignment(s_time_layer, GTextAlignmentCenter);
 
   //Time TextLayer 
-  s_timephase_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CRYSTAL_18));
-  timephase_layer = text_layer_create(GRect(85, 85, 30, 30));
+  s_timephase_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CRYSTAL_24));
+  timephase_layer = text_layer_create(GRect(115, 95, 40, 40));
   text_layer_set_background_color(timephase_layer, GColorClear);
   text_layer_set_text_color(timephase_layer, GColorWhite);
   text_layer_set_text(timephase_layer, "00");
@@ -189,7 +189,7 @@ static void set_text_to_window() {
   
   // Create current date TextLayer 
   s_date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CRYSTAL_18));
-  current_date_layer = text_layer_create(GRect(12, 133, 120, 30));
+  current_date_layer = text_layer_create(GRect(32, 153, 120, 30));
   text_layer_set_background_color(current_date_layer, GColorClear);
   text_layer_set_text_color(current_date_layer, GColorWhite);
   text_layer_set_text(current_date_layer, "00.00 000");
@@ -197,8 +197,8 @@ static void set_text_to_window() {
   text_layer_set_text_alignment(current_date_layer, GTextAlignmentCenter);
   
   //Steps TextLayer 
-  s_steps_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CRYSTAL_18));
-  steps_layer = text_layer_create(GRect(12, 15, 120, 30));
+  s_steps_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CRYSTAL_24));
+  steps_layer = text_layer_create(GRect(50, 10, 120, 30));
   text_layer_set_background_color(steps_layer, GColorClear);
   text_layer_set_text_color(steps_layer, GColorWhite);
   text_layer_set_text(steps_layer, "00000000");
@@ -215,13 +215,13 @@ static void main_window_load(Window *window) {
 
   //BATTERY: Create GBitmap, then set to created BitmapLayer
   batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt100);
-  batt_layer = bitmap_layer_create(GRect(0 ,0, 44, PBL_DISPLAY_HEIGHT));
+  batt_layer = bitmap_layer_create(GRect(0 ,0, 55, PBL_DISPLAY_HEIGHT));
   bitmap_layer_set_bitmap(batt_layer, batt_bitmap);
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(batt_layer));
   
     //BATTERY: Create GBitmap, then set to created BitmapLayer
   bt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_bt_off);
-  bt_layer = bitmap_layer_create(GRect( PBL_DISPLAY_WIDTH - 46, 0, 46, PBL_DISPLAY_HEIGHT));
+  bt_layer = bitmap_layer_create(GRect( PBL_DISPLAY_WIDTH - 55, 0, 55, PBL_DISPLAY_HEIGHT));
   bitmap_layer_set_bitmap(bt_layer, bt_bitmap);
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bt_layer));
   

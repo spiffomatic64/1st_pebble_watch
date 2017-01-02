@@ -1,6 +1,8 @@
 {
     "author": "Spiffomatic64",
-    "dependencies": {},
+    "dependencies": {
+        "pebble-clay": "^1.0.3"
+    },
     "keywords": [],
     "name": "pebbleeye-007",
     "pebble": {
@@ -82,17 +84,7 @@
                 },
                 {
                     "file": "fonts/Crysta.ttf",
-                    "name": "FONT_CRYSTAL_48",
-                    "type": "font"
-                },
-                {
-                    "file": "fonts/Crysta.ttf",
-                    "name": "FONT_CRYSTAL_36",
-                    "type": "font"
-                },
-                {
-                    "file": "fonts/Crysta.ttf",
-                    "name": "FONT_CRYSTAL_24",
+                    "name": "FONT_CRYSTAL_12",
                     "type": "font"
                 },
                 {
@@ -102,7 +94,17 @@
                 },
                 {
                     "file": "fonts/Crysta.ttf",
-                    "name": "FONT_CRYSTAL_12",
+                    "name": "FONT_CRYSTAL_24",
+                    "type": "font"
+                },
+                {
+                    "file": "fonts/Crysta.ttf",
+                    "name": "FONT_CRYSTAL_36",
+                    "type": "font"
+                },
+                {
+                    "file": "fonts/Crysta.ttf",
+                    "name": "FONT_CRYSTAL_48",
                     "type": "font"
                 }
             ]
