@@ -326,7 +326,11 @@ static void bt_handler(bool connected) {
 }
 
 static void init() {
+  prv_load_settings();
 
+  // Listen for AppMessages
+  app_message_register_inbox_received(prv_inbox_received_handler);
+  app_message_open(128, 128);
     
   // Create main Window element and assign to pointer
   s_main_window = window_create();
