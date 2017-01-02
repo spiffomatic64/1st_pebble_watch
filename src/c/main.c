@@ -76,6 +76,7 @@ static void update_bt() {
   
   gbitmap_destroy(bt_bitmap);
 
+  //replace bluetooth_connection_service_subscribe
   if (settings.Bluetooth && bluetooth_connection_service_peek()) {
      bt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_bt_on);
   } else {
