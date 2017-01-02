@@ -14,9 +14,7 @@
         "displayName": "PebbleEye 007",
         "enableMultiJS": true,
         "messageKeys": [
-            "BackgroundColor",
-            "ForegroundColor",
-            "SecondTick",
+            "Bluetooth",
             "Animations"
         ],
         "projectType": "native",

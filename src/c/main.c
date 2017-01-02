@@ -35,9 +35,7 @@ ClaySettings settings;
 
 // Initialize the default settings
 static void prv_default_settings() {
-  settings.BackgroundColor = GColorBlack;
-  settings.ForegroundColor = GColorWhite;
-  settings.SecondTick = false;
+  settings.Bluetooth = false;
   settings.Animations = false;
 }
 
@@ -57,22 +55,11 @@ static void prv_save_settings() {
 }
 
 static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) {
-  // Background Color
-  Tuple *bg_color_t = dict_find(iter, MESSAGE_KEY_BackgroundColor);
-  if (bg_color_t) {
-    settings.BackgroundColor = GColorFromHEX(bg_color_t->value->int32);
-  }
-
-  // Foreground Color
-  Tuple *fg_color_t = dict_find(iter, MESSAGE_KEY_ForegroundColor);
-  if (fg_color_t) {
-    settings.ForegroundColor = GColorFromHEX(fg_color_t->value->int32);
-  }
-
-  // Second Tick
-  Tuple *second_tick_t = dict_find(iter, MESSAGE_KEY_SecondTick);
-  if (second_tick_t) {
-    settings.SecondTick = second_tick_t->value->int32 == 1;
+  
+  // Bluetooth
+  Tuple *bluetooth_t = dict_find(iter, MESSAGE_KEY_Bluetooth);
+  if (bluetooth_t) {
+    settings.Bluetooth = bluetooth_t->value->int32 == 1;
   }
 
   // Animations
@@ -89,7 +76,7 @@ static void update_bt() {
   
   gbitmap_destroy(bt_bitmap);
 
-  if (settings.Animations && bluetooth_connection_service_peek()) {
+  if (settings.Bluetooth && bluetooth_connection_service_peek()) {
      bt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_bt_on);
   } else {
      bt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_bt_off);  
