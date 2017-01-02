@@ -35,9 +35,7 @@ ClaySettings settings;
 
 // Initialize the default settings
 static void prv_default_settings() {
-  settings.BackgroundColor = GColorBlack;
-  settings.ForegroundColor = GColorWhite;
-  settings.SecondTick = false;
+  settings.Bluetooth = false;
   settings.Animations = false;
 }
 
@@ -57,22 +55,11 @@ static void prv_save_settings() {
 }
 
 static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) {
-  // Background Color
-  Tuple *bg_color_t = dict_find(iter, MESSAGE_KEY_BackgroundColor);
-  if (bg_color_t) {
-    settings.BackgroundColor = GColorFromHEX(bg_color_t->value->int32);
-  }
-
-  // Foreground Color
-  Tuple *fg_color_t = dict_find(iter, MESSAGE_KEY_ForegroundColor);
-  if (fg_color_t) {
-    settings.ForegroundColor = GColorFromHEX(fg_color_t->value->int32);
-  }
-
-  // Second Tick
-  Tuple *second_tick_t = dict_find(iter, MESSAGE_KEY_SecondTick);
-  if (second_tick_t) {
-    settings.SecondTick = second_tick_t->value->int32 == 1;
+  
+  // Bluetooth
+  Tuple *bluetooth_t = dict_find(iter, MESSAGE_KEY_Bluetooth);
+  if (bluetooth_t) {
+    settings.Bluetooth = bluetooth_t->value->int32 == 1;
   }
 
   // Animations
@@ -89,7 +76,7 @@ static void update_bt() {
   
   gbitmap_destroy(bt_bitmap);
 
-  if (settings.Animations && bluetooth_connection_service_peek()) {
+  if (settings.Bluetooth && bluetooth_connection_service_peek()) {
      bt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_bt_on);
   } else {
      bt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_bt_off);  
@@ -176,6 +163,7 @@ static void get_steps_data() {
         }
         APP_LOG(APP_LOG_LEVEL_DEBUG, "Steps data: %d / %d", current_steps, steps_last_week);
 
+        //current_steps = 123456;
         snprintf(steps_text, sizeof(steps_text), "%d", current_steps);
 
         step_progress = (current_steps < steps_last_week);
@@ -234,7 +222,7 @@ static void set_text_to_window() {
   text_layer_set_text_alignment(s_time_layer, GTextAlignmentCenter);
 
   //Time TextLayer 
-  s_timephase_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CRYSTAL_24));
+  s_timephase_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CRYSTAL_18));
   timephase_layer = text_layer_create(GRect(115, 95, 40, 40));
   text_layer_set_background_color(timephase_layer, GColorClear);
   text_layer_set_text_color(timephase_layer, GColorWhite);
@@ -253,7 +241,7 @@ static void set_text_to_window() {
   
   //Steps TextLayer 
   s_steps_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CRYSTAL_24));
-  steps_layer = text_layer_create(GRect(50, 10, 120, 30));
+  steps_layer = text_layer_create(GRect(30, 10, 120, 30));
   text_layer_set_background_color(steps_layer, GColorClear);
   text_layer_set_text_color(steps_layer, GColorWhite);
   text_layer_set_text(steps_layer, "00000000");
@@ -326,7 +314,11 @@ static void bt_handler(bool connected) {
 }
 
 static void init() {
+  prv_load_settings();
 
+  // Listen for AppMessages
+  app_message_register_inbox_received(prv_inbox_received_handler);
+  app_message_open(128, 128);
     
   // Create main Window element and assign to pointer
   s_main_window = window_create();
