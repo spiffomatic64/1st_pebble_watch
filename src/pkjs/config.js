@@ -12,12 +12,33 @@ module.exports = [
     "items": [
       {
         "type": "heading",
-        "defaultValue": "Features"
+        "defaultValue": "Colors"
+      },
+      {
+        "type": "color",
+        "messageKey": "BackgroundColor",
+        "defaultValue": "0x000000",
+        "label": "Background Color"
+      },
+      {
+        "type": "color",
+        "messageKey": "ForegroundColor",
+        "defaultValue": "0xFFFFFF",
+        "label": "Foreground Color"
+      }
+    ]
+  },
+  {
+    "type": "section",
+    "items": [
+      {
+        "type": "heading",
+        "defaultValue": "More Settings"
       },
       {
         "type": "toggle",
-        "messageKey": "Bluetooth",
-        "label": "Enable Bluetooth Status",
+        "messageKey": "SecondTick",
+        "label": "Enable Seconds",
         "defaultValue": false
       },
       {

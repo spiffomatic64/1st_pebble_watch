@@ -5,7 +5,9 @@
 
 // A structure containing our settings
 typedef struct ClaySettings {
-  bool Bluetooth;
+  GColor BackgroundColor;
+  GColor ForegroundColor;
+  bool SecondTick;
   bool Animations;
 } __attribute__((__packed__)) ClaySettings;
 
