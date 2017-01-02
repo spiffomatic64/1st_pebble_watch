@@ -12,8 +12,13 @@
             "health"
         ],
         "displayName": "PebbleEye 007",
-        "enableMultiJS": false,
-        "messageKeys": [],
+        "enableMultiJS": true,
+        "messageKeys": [
+            "SecondTick",
+            "Animations",
+            "ForegroundColor",
+            "BackgroundColor"
+        ],
         "projectType": "native",
         "resources": {
             "media": [
@@ -84,17 +89,7 @@
                 },
                 {
                     "file": "fonts/Crysta.ttf",
-                    "name": "FONT_CRYSTAL_12",
-                    "type": "font"
-                },
-                {
-                    "file": "fonts/Crysta.ttf",
-                    "name": "FONT_CRYSTAL_18",
-                    "type": "font"
-                },
-                {
-                    "file": "fonts/Crysta.ttf",
-                    "name": "FONT_CRYSTAL_24",
+                    "name": "FONT_CRYSTAL_48",
                     "type": "font"
                 },
                 {
@@ -104,7 +99,17 @@
                 },
                 {
                     "file": "fonts/Crysta.ttf",
-                    "name": "FONT_CRYSTAL_48",
+                    "name": "FONT_CRYSTAL_24",
+                    "type": "font"
+                },
+                {
+                    "file": "fonts/Crysta.ttf",
+                    "name": "FONT_CRYSTAL_18",
+                    "type": "font"
+                },
+                {
+                    "file": "fonts/Crysta.ttf",
+                    "name": "FONT_CRYSTAL_12",
                     "type": "font"
                 }
             ]
