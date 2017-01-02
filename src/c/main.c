@@ -53,7 +53,7 @@ static void prv_load_settings() {
 static void prv_save_settings() {
   persist_write_data(SETTINGS_KEY, &settings, sizeof(settings));
   // Update the display based on new settings
-  prv_update_display();
+  //update_time();
 }
 
 static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) {
@@ -89,7 +89,7 @@ static void update_bt() {
   
   gbitmap_destroy(bt_bitmap);
 
-  if (bluetooth_connection_service_peek()) {
+  if (settings.Animations && bluetooth_connection_service_peek()) {
      bt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_bt_on);
   } else {
      bt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_bt_off);  
@@ -326,11 +326,7 @@ static void bt_handler(bool connected) {
 }
 
 static void init() {
-  prv_load_settings();
 
-  // Listen for AppMessages
-  app_message_register_inbox_received(prv_inbox_received_handler);
-  app_message_open(128, 128);
     
   // Create main Window element and assign to pointer
   s_main_window = window_create();
