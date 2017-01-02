@@ -163,6 +163,7 @@ static void get_steps_data() {
         }
         APP_LOG(APP_LOG_LEVEL_DEBUG, "Steps data: %d / %d", current_steps, steps_last_week);
 
+        //current_steps = 123456;
         snprintf(steps_text, sizeof(steps_text), "%d", current_steps);
 
         step_progress = (current_steps < steps_last_week);
@@ -221,7 +222,7 @@ static void set_text_to_window() {
   text_layer_set_text_alignment(s_time_layer, GTextAlignmentCenter);
 
   //Time TextLayer 
-  s_timephase_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CRYSTAL_24));
+  s_timephase_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CRYSTAL_18));
   timephase_layer = text_layer_create(GRect(115, 95, 40, 40));
   text_layer_set_background_color(timephase_layer, GColorClear);
   text_layer_set_text_color(timephase_layer, GColorWhite);
@@ -240,7 +241,7 @@ static void set_text_to_window() {
   
   //Steps TextLayer 
   s_steps_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CRYSTAL_24));
-  steps_layer = text_layer_create(GRect(50, 10, 120, 30));
+  steps_layer = text_layer_create(GRect(30, 10, 120, 30));
   text_layer_set_background_color(steps_layer, GColorClear);
   text_layer_set_text_color(steps_layer, GColorWhite);
   text_layer_set_text(steps_layer, "00000000");

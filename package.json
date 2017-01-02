@@ -21,6 +21,38 @@
         "resources": {
             "media": [
                 {
+                    "file": "images/pebbleEye_menu.png",
+                    "menuIcon": true,
+                    "name": "pebbleEye_menu",
+                    "targetPlatforms": null,
+                    "type": "png"
+                },
+                {
+                    "file": "fonts/Crysta.ttf",
+                    "name": "FONT_CRYSTAL_12",
+                    "type": "font"
+                },
+                {
+                    "file": "fonts/Crysta.ttf",
+                    "name": "FONT_CRYSTAL_18",
+                    "type": "font"
+                },
+                {
+                    "file": "fonts/Crysta.ttf",
+                    "name": "FONT_CRYSTAL_24",
+                    "type": "font"
+                },
+                {
+                    "file": "fonts/Crysta.ttf",
+                    "name": "FONT_CRYSTAL_36",
+                    "type": "font"
+                },
+                {
+                    "file": "fonts/Crysta.ttf",
+                    "name": "FONT_CRYSTAL_48",
+                    "type": "font"
+                },
+                {
                     "file": "images/batt00.png",
                     "name": "batt00",
                     "type": "png"
@@ -84,31 +116,6 @@
                     "file": "images/pebbleEye_bg.png",
                     "name": "bg_image",
                     "type": "png"
-                },
-                {
-                    "file": "fonts/Crysta.ttf",
-                    "name": "FONT_CRYSTAL_48",
-                    "type": "font"
-                },
-                {
-                    "file": "fonts/Crysta.ttf",
-                    "name": "FONT_CRYSTAL_36",
-                    "type": "font"
-                },
-                {
-                    "file": "fonts/Crysta.ttf",
-                    "name": "FONT_CRYSTAL_24",
-                    "type": "font"
-                },
-                {
-                    "file": "fonts/Crysta.ttf",
-                    "name": "FONT_CRYSTAL_18",
-                    "type": "font"
-                },
-                {
-                    "file": "fonts/Crysta.ttf",
-                    "name": "FONT_CRYSTAL_12",
-                    "type": "font"
                 }
             ]
         },
@@ -116,7 +123,7 @@
         "targetPlatforms": [
             "chalk"
         ],
-        "uuid": "935d5693-7a17-466c-a680-4ab79bdc50ea",
+        "uuid": "4d96f645-eb1e-4ce1-8e77-7badbe85544e",
         "watchapp": {
             "watchface": true
         }
