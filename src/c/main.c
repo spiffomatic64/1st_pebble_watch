@@ -5,6 +5,9 @@
 
 #include <pebble-events/pebble-events.h>
 #include <pebble-dash-api/pebble-dash-api.h>
+
+//todo: add weather, gsm strength, sms count, and calendar
+//https://www.npmjs.com/package/pebble-dash-api
   
 static Window *s_main_window;
 
@@ -45,8 +48,27 @@ static void error_callback(ErrorCode code) {
 }
 
 static void get_callback(DataType type, DataValue result) {
-  phone_batt = result.integer_value;
-  APP_LOG(APP_LOG_LEVEL_INFO, "Phone Battery:\n%d%%", result.integer_value);
+  if (type == DataTypeBatteryPercent)
+  {
+    phone_batt = result.integer_value;
+    APP_LOG(APP_LOG_LEVEL_INFO, "Phone Battery:\n%d%%", result.integer_value);
+    
+    gbitmap_destroy(phone_bitmap);
+  
+    if (phone_batt>90) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone100);
+    else if (phone_batt>80) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone80);
+    else if (phone_batt>70) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone70);
+    else if (phone_batt>60) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone60);
+    else if (phone_batt>50) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone50);
+    else if (phone_batt>40) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone40);
+    else if (phone_batt>30) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone30);
+    else if (phone_batt>20) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone20);
+    else if (phone_batt>10) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone10);
+    else phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone00);
+     
+    
+    bitmap_layer_set_bitmap(phone_layer, phone_bitmap);
+  }
 }
 
 // Initialize the default settings
@@ -107,22 +129,6 @@ static void update_bt() {
 static void update_phone_batt() {
     
   dash_api_get_data(DataTypeBatteryPercent, get_callback);
-  
-  gbitmap_destroy(phone_bitmap);
-  
-  if (phone_batt>90) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone100);
-  else if (phone_batt>80) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone80);
-  else if (phone_batt>70) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone70);
-  else if (phone_batt>60) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone60);
-  else if (phone_batt>50) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone50);
-  else if (phone_batt>40) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone40);
-  else if (phone_batt>30) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone30);
-  else if (phone_batt>20) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone20);
-  else if (phone_batt>10) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone10);
-  else phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone00);
-   
-  
-  bitmap_layer_set_bitmap(batt_layer, batt_bitmap);
   
 }
 
@@ -340,6 +346,7 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   update_time();
 }
 
+//seperate data getters, and screen updaters
 static void min_handler(struct tm *tick_time, TimeUnits units_changed) {
   update_phone_batt();
   
@@ -383,6 +390,11 @@ static void init() {
   // Register with TickTimerService
   tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
   tick_timer_service_subscribe(MINUTE_UNIT, min_handler);
+  
+  update_phone_batt();
+  update_bt();
+  update_batt();
+  get_steps_data();
 }
 
 static void deinit() {
