@@ -20,17 +20,19 @@ static GFont s_steps_font;
 
 static BitmapLayer *clock_layer;
 static BitmapLayer *batt_layer;
-static BitmapLayer *bt_layer;
+static BitmapLayer *phone_layer;
 
 static GBitmap *clock_bitmap;
 static GBitmap *batt_bitmap;
-static GBitmap *bt_bitmap;
+static GBitmap *phone_bitmap;
 
 // Create a long-lived buffer
 static char buffer[] = "00:00";
 static char current_date_buffer[] = "00.00 000";
 static char timephase_buffer[] = "00";
 static char steps_text[] = "00000000";
+
+static int phone_batt = 0;
 
 static bool step_progress = false;
 
@@ -43,6 +45,7 @@ static void error_callback(ErrorCode code) {
 }
 
 static void get_callback(DataType type, DataValue result) {
+  phone_batt = result.integer_value;
   APP_LOG(APP_LOG_LEVEL_INFO, "Phone Battery:\n%d%%", result.integer_value);
 }
 
@@ -88,26 +91,38 @@ static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) 
 static void update_bt() {
   
   /*
+  gbitmap_destroy(phone_bitmap);
+
+  //replace bluetooth_connection_service_subscribe
   if (settings.Bluetooth && bluetooth_connection_service_peek()) {
-     bt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_bt_on);
+     phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_bt_on);
   } else {
-     bt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_bt_off);  
+     phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_bt_off);  
   }
+  bitmap_layer_set_bitmap(phone_layer, phone_bitmap);
   */
   
 }
 
 static void update_phone_batt() {
+    
+  dash_api_get_data(DataTypeBatteryPercent, get_callback);
   
-  gbitmap_destroy(bt_bitmap);
-
-  //replace bluetooth_connection_service_subscribe
-  if (settings.Bluetooth && bluetooth_connection_service_peek()) {
-     bt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_bt_on);
-  } else {
-     bt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_bt_off);  
-  }
-  bitmap_layer_set_bitmap(bt_layer, bt_bitmap);
+  gbitmap_destroy(phone_bitmap);
+  
+  if (phone_batt>90) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone100);
+  else if (phone_batt>80) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone80);
+  else if (phone_batt>70) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone70);
+  else if (phone_batt>60) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone60);
+  else if (phone_batt>50) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone50);
+  else if (phone_batt>40) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone40);
+  else if (phone_batt>30) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone30);
+  else if (phone_batt>20) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone20);
+  else if (phone_batt>10) phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone10);
+  else phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone00);
+   
+  
+  bitmap_layer_set_bitmap(batt_layer, batt_bitmap);
   
 }
 
@@ -279,10 +294,10 @@ static void main_window_load(Window *window) {
   layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(batt_layer));
   
     //BATTERY: Create GBitmap, then set to created BitmapLayer
-  bt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_bt_off);
-  bt_layer = bitmap_layer_create(GRect( PBL_DISPLAY_WIDTH - 55, 0, 55, PBL_DISPLAY_HEIGHT));
-  bitmap_layer_set_bitmap(bt_layer, bt_bitmap);
-  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(bt_layer));
+  phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone100);
+  phone_layer = bitmap_layer_create(GRect( PBL_DISPLAY_WIDTH - 55, 0, 55, PBL_DISPLAY_HEIGHT));
+  bitmap_layer_set_bitmap(phone_layer, phone_bitmap);
+  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(phone_layer));
   
 
   
@@ -307,12 +322,12 @@ static void main_window_unload(Window *window) {
   //Destroy GBitmap
   gbitmap_destroy(clock_bitmap);
   gbitmap_destroy(batt_bitmap);
-  gbitmap_destroy(bt_bitmap);
+  gbitmap_destroy(phone_bitmap);
 
   //Destroy BitmapLayer
   bitmap_layer_destroy(clock_layer);
   bitmap_layer_destroy(batt_layer);
-  bitmap_layer_destroy(bt_layer);
+  bitmap_layer_destroy(phone_layer);
   
   // Destroy TextLayer
   text_layer_destroy(s_time_layer);
@@ -326,7 +341,7 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 }
 
 static void min_handler(struct tm *tick_time, TimeUnits units_changed) {
-  dash_api_get_data(DataTypeBatteryPercent, get_callback);
+  update_phone_batt();
   
   update_bt();
   

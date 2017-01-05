@@ -22,11 +22,6 @@
         "resources": {
             "media": [
                 {
-                    "file": "images/bt_on.png",
-                    "name": "bt_on",
-                    "type": "png"
-                },
-                {
                     "file": "fonts/Crysta.ttf",
                     "name": "FONT_CRYSTAL_48",
                     "type": "font"
@@ -52,16 +47,6 @@
                     "type": "font"
                 },
                 {
-                    "file": "images/batt00.png",
-                    "name": "batt00",
-                    "type": "png"
-                },
-                {
-                    "file": "images/batt10.png",
-                    "name": "batt10",
-                    "type": "png"
-                },
-                {
                     "file": "images/pebbleEye_bg.png",
                     "name": "bg_image",
                     "type": "png"
@@ -79,28 +64,8 @@
                     "type": "png"
                 },
                 {
-                    "file": "images/batt20.png",
-                    "name": "batt20",
-                    "type": "png"
-                },
-                {
-                    "file": "images/batt30.png",
-                    "name": "batt30",
-                    "type": "png"
-                },
-                {
-                    "file": "images/batt40.png",
-                    "name": "batt40",
-                    "type": "png"
-                },
-                {
-                    "file": "images/batt50.png",
-                    "name": "batt50",
-                    "type": "png"
-                },
-                {
-                    "file": "images/batt60.png",
-                    "name": "batt60",
+                    "file": "images/batt80.png",
+                    "name": "batt80",
                     "type": "png"
                 },
                 {
@@ -109,13 +74,88 @@
                     "type": "png"
                 },
                 {
+                    "file": "images/batt60.png",
+                    "name": "batt60",
+                    "type": "png"
+                },
+                {
+                    "file": "images/batt50.png",
+                    "name": "batt50",
+                    "type": "png"
+                },
+                {
+                    "file": "images/batt40.png",
+                    "name": "batt40",
+                    "type": "png"
+                },
+                {
+                    "file": "images/batt30.png",
+                    "name": "batt30",
+                    "type": "png"
+                },
+                {
+                    "file": "images/batt20.png",
+                    "name": "batt20",
+                    "type": "png"
+                },
+                {
+                    "file": "images/batt10.png",
+                    "name": "batt10",
+                    "type": "png"
+                },
+                {
+                    "file": "images/batt00.png",
+                    "name": "batt00",
+                    "type": "png"
+                },
+                {
+                    "file": "images/batt100.png",
+                    "name": "batt100",
+                    "type": "png"
+                },
+                {
                     "file": "images/batt80.png",
                     "name": "batt80",
                     "type": "png"
                 },
                 {
-                    "file": "images/bt_off.png",
-                    "name": "bt_off",
+                    "file": "images/batt70.png",
+                    "name": "batt70",
+                    "type": "png"
+                },
+                {
+                    "file": "images/batt60.png",
+                    "name": "batt60",
+                    "type": "png"
+                },
+                {
+                    "file": "images/batt50.png",
+                    "name": "batt50",
+                    "type": "png"
+                },
+                {
+                    "file": "images/batt40.png",
+                    "name": "batt40",
+                    "type": "png"
+                },
+                {
+                    "file": "images/batt30.png",
+                    "name": "batt30",
+                    "type": "png"
+                },
+                {
+                    "file": "images/batt20.png",
+                    "name": "batt20",
+                    "type": "png"
+                },
+                {
+                    "file": "images/batt10.png",
+                    "name": "batt10",
+                    "type": "png"
+                },
+                {
+                    "file": "images/batt00.png",
+                    "name": "batt00",
                     "type": "png"
                 }
             ]
