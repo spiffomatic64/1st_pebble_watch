@@ -173,7 +173,7 @@ static void get_steps_data() {
         }
         APP_LOG(APP_LOG_LEVEL_DEBUG, "Steps data: %d / %d", current_steps, steps_last_week);
 
-        current_steps = 123456;
+        //current_steps = 123456;
         snprintf(steps_text, sizeof(steps_text), "%d", current_steps);
 
         step_progress = (current_steps < steps_last_week);
