@@ -3,6 +3,8 @@
 
 #define SETTINGS_KEY 1
 
+#define APP_NAME "Double0Spiff"
+
 // A structure containing our settings
 typedef struct ClaySettings {
   bool Bluetooth;

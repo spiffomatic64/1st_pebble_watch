@@ -2,6 +2,9 @@
 #include "main.h"
 #include <stdio.h>
 #include <ctype.h>
+
+#include <pebble-events/pebble-events.h>
+#include <pebble-dash-api/pebble-dash-api.h>
   
 static Window *s_main_window;
 
@@ -32,6 +35,12 @@ static char steps_text[] = "00000000";
 static bool step_progress = false;
 
 ClaySettings settings;
+
+static void error_callback(ErrorCode code) {
+  //if(code != ErrorCodeSuccess) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Error! Code=%d", code);
+  //}
+}
 
 // Initialize the default settings
 static void prv_default_settings() {
@@ -164,11 +173,15 @@ static void get_steps_data() {
         }
         APP_LOG(APP_LOG_LEVEL_DEBUG, "Steps data: %d / %d", current_steps, steps_last_week);
 
-        //current_steps = 123456;
+        current_steps = 123456;
         snprintf(steps_text, sizeof(steps_text), "%d", current_steps);
 
         step_progress = (current_steps < steps_last_week);
     }
+}
+
+static void get_callback(DataType type, DataValue result) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Phone Battery:\n%d%%", result.integer_value);
 }
 
 static void update_time() {
@@ -242,7 +255,7 @@ static void set_text_to_window() {
   
   //Steps TextLayer 
   s_steps_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_CRYSTAL_24));
-  steps_layer = text_layer_create(GRect(30, 10, 120, 30));
+  steps_layer = text_layer_create(GRect(30, 5, 120, 30));
   text_layer_set_background_color(steps_layer, GColorClear);
   text_layer_set_text_color(steps_layer, GColorWhite);
   text_layer_set_text(steps_layer, "00000000");
@@ -309,12 +322,18 @@ static void main_window_unload(Window *window) {
 static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
   update_time();
 }
+
+static void min_handler(struct tm *tick_time, TimeUnits units_changed) {
+  dash_api_get_data(DataTypeBatteryPercent, get_callback);
+}
+
   
 static void bt_handler(bool connected) {
   
 }
 
 static void init() {
+  
   prv_load_settings();
 
   // Listen for AppMessages
@@ -332,10 +351,15 @@ static void init() {
 
   // Show the Window on the watch, with animated=true
   window_stack_push(s_main_window, true);
+  
+  dash_api_init(APP_NAME, error_callback);
+  events_app_message_open();
+  
   bluetooth_connection_service_subscribe(bt_handler);
   
   // Register with TickTimerService
   tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
+  tick_timer_service_subscribe(MINUTE_UNIT, min_handler);
 }
 
 static void deinit() {
