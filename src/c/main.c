@@ -42,6 +42,10 @@ static void error_callback(ErrorCode code) {
   //}
 }
 
+static void get_callback(DataType type, DataValue result) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "Phone Battery:\n%d%%", result.integer_value);
+}
+
 // Initialize the default settings
 static void prv_default_settings() {
   settings.Bluetooth = true;
@@ -83,6 +87,18 @@ static void prv_inbox_received_handler(DictionaryIterator *iter, void *context) 
 
 static void update_bt() {
   
+  /*
+  if (settings.Bluetooth && bluetooth_connection_service_peek()) {
+     bt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_bt_on);
+  } else {
+     bt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_bt_off);  
+  }
+  */
+  
+}
+
+static void update_phone_batt() {
+  
   gbitmap_destroy(bt_bitmap);
 
   //replace bluetooth_connection_service_subscribe
@@ -95,7 +111,7 @@ static void update_bt() {
   
 }
 
-static void update_batt(struct tm *tick_time) {
+static void update_batt() {
   
   BatteryChargeState state = battery_state_service_peek();
   gbitmap_destroy(batt_bitmap);
@@ -126,16 +142,10 @@ static void update_batt(struct tm *tick_time) {
        batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt20);
        break;
     case 10: 
-       if ( tick_time->tm_sec % 2 == 0)
-          batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt00);
-       else
-          batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt10);       
+       batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt10);
        break;
     case 00: 
-       if ( tick_time->tm_sec % 2 == 0)
-          batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt00);
-       else
-          batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt10);       
+       batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt00);
        break;
     default: 
        batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt100);
@@ -180,10 +190,6 @@ static void get_steps_data() {
     }
 }
 
-static void get_callback(DataType type, DataValue result) {
-  APP_LOG(APP_LOG_LEVEL_INFO, "Phone Battery:\n%d%%", result.integer_value);
-}
-
 static void update_time() {
   // Get a tm structure
   time_t temp = time(NULL); 
@@ -212,11 +218,7 @@ static void update_time() {
     i++;
   }  //write to all text layers
 
-  update_bt();
   
-  update_batt(tick_time);
-  
-  get_steps_data();
     
   text_layer_set_text(s_time_layer, buffer);
   text_layer_set_text(timephase_layer, timephase_buffer);
@@ -325,6 +327,12 @@ static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 
 static void min_handler(struct tm *tick_time, TimeUnits units_changed) {
   dash_api_get_data(DataTypeBatteryPercent, get_callback);
+  
+  update_bt();
+  
+  update_batt();
+  
+  get_steps_data();
 }
 
   
