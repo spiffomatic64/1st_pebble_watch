@@ -109,53 +109,53 @@
                     "type": "png"
                 },
                 {
-                    "file": "images/batt100.png",
-                    "name": "batt100",
+                    "file": "images/phone100.png",
+                    "name": "phone100",
                     "type": "png"
                 },
                 {
-                    "file": "images/batt80.png",
-                    "name": "batt80",
+                    "file": "images/phone80.png",
+                    "name": "phone80",
                     "type": "png"
                 },
                 {
-                    "file": "images/batt70.png",
-                    "name": "batt70",
+                    "file": "images/phone70.png",
+                    "name": "phone70",
                     "type": "png"
                 },
                 {
-                    "file": "images/batt60.png",
-                    "name": "batt60",
+                    "file": "images/phone60.png",
+                    "name": "phone60",
                     "type": "png"
                 },
                 {
-                    "file": "images/batt50.png",
-                    "name": "batt50",
+                    "file": "images/phone50.png",
+                    "name": "phone50",
                     "type": "png"
                 },
                 {
-                    "file": "images/batt40.png",
-                    "name": "batt40",
+                    "file": "images/phone40.png",
+                    "name": "phone40",
                     "type": "png"
                 },
                 {
-                    "file": "images/batt30.png",
-                    "name": "batt30",
+                    "file": "images/phone30.png",
+                    "name": "phone30",
                     "type": "png"
                 },
                 {
-                    "file": "images/batt20.png",
-                    "name": "batt20",
+                    "file": "images/phone20.png",
+                    "name": "phone20",
                     "type": "png"
                 },
                 {
-                    "file": "images/batt10.png",
-                    "name": "batt10",
+                    "file": "images/phone10.png",
+                    "name": "phone10",
                     "type": "png"
                 },
                 {
-                    "file": "images/batt00.png",
-                    "name": "batt00",
+                    "file": "images/phone00.png",
+                    "name": "phone00",
                     "type": "png"
                 }
             ]
