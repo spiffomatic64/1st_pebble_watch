@@ -11,6 +11,7 @@
   
 static Window *s_main_window;
 
+//Texts
 static TextLayer *s_time_layer;
 static TextLayer *current_date_layer;
 static TextLayer *timephase_layer;
@@ -21,6 +22,7 @@ static GFont s_timephase_font;
 static GFont s_date_font;
 static GFont s_steps_font;
 
+//Bitmaps
 static BitmapLayer *clock_layer;
 static BitmapLayer *batt_layer;
 static BitmapLayer *phone_layer;
@@ -28,6 +30,9 @@ static BitmapLayer *phone_layer;
 static GBitmap *clock_bitmap;
 static GBitmap *batt_bitmap;
 static GBitmap *phone_bitmap;
+
+//Canvass
+static Layer *canvas_layer;
 
 // Create a long-lived buffer
 static char buffer[] = "00:00";
@@ -38,6 +43,7 @@ static char steps_text[] = "00000000";
 static int phone_batt = 0;
 
 static bool step_progress = false;
+static bool bluetooth_connected = false;
 
 ClaySettings settings;
 
@@ -48,10 +54,11 @@ static void error_callback(ErrorCode code) {
 }
 
 static void get_callback(DataType type, DataValue result) {
+  APP_LOG(APP_LOG_LEVEL_INFO, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXget_callback", result.integer_value);
   if (type == DataTypeBatteryPercent)
   {
     phone_batt = result.integer_value;
-    APP_LOG(APP_LOG_LEVEL_INFO, "Phone Battery:\n%d%%", result.integer_value);
+    APP_LOG(APP_LOG_LEVEL_INFO, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXPhone Battery: %d%%", result.integer_value);
     
     gbitmap_destroy(phone_bitmap);
   
@@ -182,6 +189,8 @@ static void get_steps_data() {
     int one_day = 24 * SECONDS_PER_HOUR;
     int current_steps = 0;
     int steps_last_week = 0;
+  
+  //health_service_events_subscribe
 
     HealthMetric metric_steps = HealthMetricStepCount;
     HealthServiceAccessibilityMask mask_steps =
@@ -190,24 +199,10 @@ static void get_steps_data() {
     if (mask_steps & HealthServiceAccessibilityMaskAvailable) {
         current_steps = (int)health_service_sum_today(metric_steps);
 
-        steps_last_week = 0;
-        HealthServiceAccessibilityMask mask_steps_average =
-            health_service_metric_averaged_accessible(metric_steps, start, end, HealthServiceTimeScopeDailyWeekdayOrWeekend);
-
-        if (mask_steps_average & HealthServiceAccessibilityMaskAvailable) {
-            steps_last_week = (int)health_service_sum_averaged(metric_steps, start, end, HealthServiceTimeScopeDailyWeekdayOrWeekend);
-        } else {
-            for (int i = 7; i <= 28; i = i+7) {
-                steps_last_week += (int)health_service_sum(metric_steps, start - i*one_day, end - i*one_day);
-            }
-            steps_last_week /= 4;
-        }
         APP_LOG(APP_LOG_LEVEL_DEBUG, "Steps data: %d / %d", current_steps, steps_last_week);
 
         //current_steps = 123456;
         snprintf(steps_text, sizeof(steps_text), "%d", current_steps);
-
-        step_progress = (current_steps < steps_last_week);
     }
 }
 
@@ -286,33 +281,53 @@ static void set_text_to_window() {
   text_layer_set_text_alignment(steps_layer, GTextAlignmentCenter);
 }
 
+static void canvas_update_proc(Layer *layer, GContext *ctx) {
+  if(!bluetooth_connected) {
+    graphics_context_set_fill_color(ctx, GColorRed);
+    graphics_fill_rect(ctx, GRect(49, 132, 15, 3), 0, GCornerNone);
+  }
+}
+
 static void main_window_load(Window *window) {
+  
+  // Get the Window's root layer
+  Layer *root_layer = window_get_root_layer(window);
+  
   //ACTION: Create GBitmap, then set to created BitmapLayer
   clock_bitmap = gbitmap_create_with_resource(RESOURCE_ID_bg_image);
   clock_layer = bitmap_layer_create(GRect(0, 0, PBL_DISPLAY_WIDTH, PBL_DISPLAY_HEIGHT));
   bitmap_layer_set_bitmap(clock_layer, clock_bitmap);
-  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(clock_layer));
+  layer_add_child(root_layer, bitmap_layer_get_layer(clock_layer));
 
   //BATTERY: Create GBitmap, then set to created BitmapLayer
   batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt100);
   batt_layer = bitmap_layer_create(GRect(0 ,0, 55, PBL_DISPLAY_HEIGHT));
   bitmap_layer_set_bitmap(batt_layer, batt_bitmap);
-  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(batt_layer));
+  layer_add_child(root_layer, bitmap_layer_get_layer(batt_layer));
   
     //BATTERY: Create GBitmap, then set to created BitmapLayer
   phone_bitmap = gbitmap_create_with_resource(RESOURCE_ID_phone100);
   phone_layer = bitmap_layer_create(GRect( PBL_DISPLAY_WIDTH - 55, 0, 55, PBL_DISPLAY_HEIGHT));
   bitmap_layer_set_bitmap(phone_layer, phone_bitmap);
-  layer_add_child(window_get_root_layer(window), bitmap_layer_get_layer(phone_layer));
+  layer_add_child(root_layer, bitmap_layer_get_layer(phone_layer));
   
 
-  
+  //Create text layers
   set_text_to_window();
-    
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(current_date_layer));
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_time_layer));
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(timephase_layer));
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(steps_layer));
+  layer_add_child(root_layer, text_layer_get_layer(current_date_layer));
+  layer_add_child(root_layer, text_layer_get_layer(s_time_layer));
+  layer_add_child(root_layer, text_layer_get_layer(timephase_layer));
+  layer_add_child(root_layer, text_layer_get_layer(steps_layer));
+  
+  // Create canvas layer
+  GRect bounds = layer_get_bounds(window_get_root_layer(window));
+  canvas_layer = layer_create(bounds);
+
+  // Assign the custom drawing procedure
+  layer_set_update_proc(canvas_layer, canvas_update_proc);
+  
+  // Add the layer, publish the window
+  layer_add_child(root_layer, canvas_layer);
   
   // Make sure the time is displayed from the start
   update_time();
@@ -342,24 +357,38 @@ static void main_window_unload(Window *window) {
   text_layer_destroy(steps_layer);
 }
 
-static void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
-  update_time();
-}
-
-//seperate data getters, and screen updaters
 static void min_handler(struct tm *tick_time, TimeUnits units_changed) {
+  update_time();  
   update_phone_batt();
-  
-  update_bt();
-  
-  update_batt();
-  
+  //update_bt();
+  //update_batt();
   get_steps_data();
 }
 
+static void bluetooth_handler(bool connected) {
+  bluetooth_connected = connected;
+  APP_LOG(APP_LOG_LEVEL_ERROR, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX BT Status=%d", connected);
+  layer_mark_dirty(canvas_layer);
+}
+
+static void battery_handler(BatteryChargeState charge_state) {
+    
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Battery Status=%d", charge_state.charge_percent);
+    gbitmap_destroy(batt_bitmap);
   
-static void bt_handler(bool connected) {
-  
+    if (charge_state.charge_percent>=90) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt100);
+    else if (charge_state.charge_percent>=80) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt80);
+    else if (charge_state.charge_percent>=70) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt70);
+    else if (charge_state.charge_percent>=60) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt60);
+    else if (charge_state.charge_percent>=50) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt50);
+    else if (charge_state.charge_percent>=40) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt40);
+    else if (charge_state.charge_percent>=30) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt30);
+    else if (charge_state.charge_percent>=20) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt20);
+    else if (charge_state.charge_percent>=10) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt10);
+    else batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt00);
+     
+
+    bitmap_layer_set_bitmap(batt_layer, batt_bitmap);
 }
 
 static void init() {
@@ -382,18 +411,27 @@ static void init() {
   // Show the Window on the watch, with animated=true
   window_stack_push(s_main_window, true);
   
+  // Dash setup
   dash_api_init(APP_NAME, error_callback);
   events_app_message_open();
   
-  bluetooth_connection_service_subscribe(bt_handler);
+  // Register with bluetooth service
+  connection_service_subscribe((ConnectionHandlers) {
+    .pebble_app_connection_handler = bluetooth_handler
+  });
   
   // Register with TickTimerService
-  tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
   tick_timer_service_subscribe(MINUTE_UNIT, min_handler);
   
+  // Register with bluetooth service
+  battery_state_service_subscribe(battery_handler);
+  
+  battery_handler(battery_state_service_peek());
+  
   update_phone_batt();
-  update_bt();
-  update_batt();
+  bluetooth_connected = bluetooth_connection_service_peek();
+  //update_bt();
+  //update_batt();
   get_steps_data();
 }
 
@@ -401,6 +439,8 @@ static void deinit() {
   // Destroy Window
   window_destroy(s_main_window);
   tick_timer_service_unsubscribe();
+  battery_state_service_unsubscribe();
+  connection_service_unsubscribe();
 }
 
 int main(void) {
