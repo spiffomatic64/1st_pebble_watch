@@ -6,8 +6,18 @@
 #include <pebble-events/pebble-events.h>
 #include <pebble-dash-api/pebble-dash-api.h>
 
+#include "health.h"
+
+#include <time.h>
+
 //todo: add weather, gsm strength, sms count, and calendar
 //https://www.npmjs.com/package/pebble-dash-api
+
+static const uint32_t KEY_SAVEDATE = 0x01;
+static const uint32_t KEY_BT = 0x02;
+static const uint32_t KEY_BATT = 0x03;
+static const uint32_t KEY_PHONEBATT = 0x04;
+static const uint32_t KEY_STEPS = 0x05;
   
 static Window *s_main_window;
 
@@ -41,9 +51,12 @@ static char timephase_buffer[] = "00";
 static char steps_text[] = "00000000";
 
 static int phone_batt = 0;
+static int watch_batt = 0;
+static int current_steps = 0;
 
-static bool step_progress = false;
 static bool bluetooth_connected = false;
+
+static time_t savedTimestamp;
 
 ClaySettings settings;
 
@@ -58,7 +71,7 @@ static void get_callback(DataType type, DataValue result) {
   if (type == DataTypeBatteryPercent)
   {
     phone_batt = result.integer_value;
-    APP_LOG(APP_LOG_LEVEL_INFO, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXPhone Battery: %d%%", result.integer_value);
+    APP_LOG(APP_LOG_LEVEL_ERROR, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXPhone Battery: %d%%", result.integer_value);
     
     gbitmap_destroy(phone_bitmap);
   
@@ -183,27 +196,14 @@ static void update_batt() {
   bitmap_layer_set_bitmap(batt_layer, batt_bitmap);
 }
 
-static void get_steps_data() {
-    time_t start = time_start_of_today();
-    time_t end = time(NULL);
-    int one_day = 24 * SECONDS_PER_HOUR;
-    int current_steps = 0;
-    int steps_last_week = 0;
-  
-  //health_service_events_subscribe
+void get_steps_data() {
 
-    HealthMetric metric_steps = HealthMetricStepCount;
-    HealthServiceAccessibilityMask mask_steps =
-        health_service_metric_accessible(metric_steps, start, end);
+    current_steps = (int)health_service_sum_today(HealthMetricStepCount);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Steps data: %d", current_steps);
 
-    if (mask_steps & HealthServiceAccessibilityMaskAvailable) {
-        current_steps = (int)health_service_sum_today(metric_steps);
+    //current_steps = 123456;
+    snprintf(steps_text, sizeof(steps_text), "%d", current_steps);
 
-        APP_LOG(APP_LOG_LEVEL_DEBUG, "Steps data: %d / %d", current_steps, steps_last_week);
-
-        //current_steps = 123456;
-        snprintf(steps_text, sizeof(steps_text), "%d", current_steps);
-    }
 }
 
 static void update_time() {
@@ -211,7 +211,7 @@ static void update_time() {
   time_t temp = time(NULL); 
   struct tm *tick_time = localtime(&temp);
 
-  
+  APP_LOG(APP_LOG_LEVEL_ERROR, "UPDATE TIME");
   if(clock_is_24h_style() == true) {
     //Use 2h hour format
     strftime(buffer, sizeof("00:00"), "%H:%M", tick_time);
@@ -359,10 +359,12 @@ static void main_window_unload(Window *window) {
 
 static void min_handler(struct tm *tick_time, TimeUnits units_changed) {
   update_time();  
-  update_phone_batt();
+  if(tick_time->tm_min % 10 == 0) update_phone_batt();
+  APP_LOG(APP_LOG_LEVEL_INFO, "Min Handler");
+  // These are now hooked to call backs
   //update_bt();
   //update_batt();
-  get_steps_data();
+  //get_steps_data();
 }
 
 static void bluetooth_handler(bool connected) {
@@ -371,24 +373,33 @@ static void bluetooth_handler(bool connected) {
   layer_mark_dirty(canvas_layer);
 }
 
+//add handlers to only take the data
+
 static void battery_handler(BatteryChargeState charge_state) {
     
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Battery Status=%d", charge_state.charge_percent);
-    gbitmap_destroy(batt_bitmap);
-  
-    if (charge_state.charge_percent>=90) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt100);
-    else if (charge_state.charge_percent>=80) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt80);
-    else if (charge_state.charge_percent>=70) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt70);
-    else if (charge_state.charge_percent>=60) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt60);
-    else if (charge_state.charge_percent>=50) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt50);
-    else if (charge_state.charge_percent>=40) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt40);
-    else if (charge_state.charge_percent>=30) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt30);
-    else if (charge_state.charge_percent>=20) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt20);
-    else if (charge_state.charge_percent>=10) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt10);
-    else batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt00);
+    APP_LOG(APP_LOG_LEVEL_INFO, "battery_handler", charge_state.charge_percent, charge_state.is_charging, charge_state.is_plugged);
+    
+    if (watch_batt != charge_state.charge_percent)
+    {
+      watch_batt = charge_state.charge_percent;
+      APP_LOG(APP_LOG_LEVEL_ERROR, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX charge_percent=%d is_charging=%d is_plugged=%d", charge_state.charge_percent, charge_state.is_charging, charge_state.is_plugged);
+      gbitmap_destroy(batt_bitmap);
+      if (charge_state.charge_percent>=90) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt100);
+      else if (charge_state.charge_percent>=80) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt80);
+      else if (charge_state.charge_percent>=70) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt70);
+      else if (charge_state.charge_percent>=60) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt60);
+      else if (charge_state.charge_percent>=50) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt50);
+      else if (charge_state.charge_percent>=40) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt40);
+      else if (charge_state.charge_percent>=30) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt30);
+      else if (charge_state.charge_percent>=20) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt20);
+      else if (charge_state.charge_percent>=10) batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt10);
+      else batt_bitmap = gbitmap_create_with_resource(RESOURCE_ID_batt00);
      
 
-    bitmap_layer_set_bitmap(batt_layer, batt_bitmap);
+      bitmap_layer_set_bitmap(batt_layer, batt_bitmap);
+    }
+  
+    
 }
 
 static void init() {
@@ -423,16 +434,53 @@ static void init() {
   // Register with TickTimerService
   tick_timer_service_subscribe(MINUTE_UNIT, min_handler);
   
-  // Register with bluetooth service
+  // Register with battery service
   battery_state_service_subscribe(battery_handler);
   
-  battery_handler(battery_state_service_peek());
+  // Register with health service
+  health_init();
   
-  update_phone_batt();
-  bluetooth_connected = bluetooth_connection_service_peek();
-  //update_bt();
-  //update_batt();
-  get_steps_data();
+  //run first update manually
+  time_t currentTimestamp;
+
+  time(&currentTimestamp);
+
+  if (persist_exists(KEY_SAVEDATE) && persist_exists(KEY_BT) && persist_exists(KEY_BATT) &&
+            persist_exists(KEY_PHONEBATT) && persist_exists(KEY_STEPS))
+  {
+    persist_read_data(KEY_SAVEDATE, (void*)&savedTimestamp, sizeof(savedTimestamp));
+
+    int timediff = currentTimestamp - savedTimestamp;
+    APP_LOG(APP_LOG_LEVEL_ERROR, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX savedTimestamp %ld", savedTimestamp);
+    APP_LOG(APP_LOG_LEVEL_ERROR, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX currentTimestamp %ld", currentTimestamp);
+    APP_LOG(APP_LOG_LEVEL_ERROR, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX timediff %ld", timediff);
+    
+    if (timediff > 10)
+    {
+      APP_LOG(APP_LOG_LEVEL_ERROR, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX timediff update!");
+      battery_handler(battery_state_service_peek());
+      update_phone_batt();
+      bluetooth_connected = bluetooth_connection_service_peek();
+      get_steps_data();
+    } else
+    {
+      bluetooth_connected = persist_read_bool(KEY_BT);
+      watch_batt = persist_read_int(KEY_BATT);
+      battery_handler(watch_batt);
+      phone_batt = persist_read_int(KEY_PHONEBATT);
+      current_steps = persist_read_int(KEY_STEPS);
+      APP_LOG(APP_LOG_LEVEL_ERROR, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX Reading cached values!");
+    }
+  } else
+  {
+    battery_handler(battery_state_service_peek());
+    update_phone_batt();
+    bluetooth_connected = bluetooth_connection_service_peek();
+    get_steps_data();
+    APP_LOG(APP_LOG_LEVEL_ERROR, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX nokeys update!");
+  }
+             
+  APP_LOG(APP_LOG_LEVEL_ERROR, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX Initialized");
 }
 
 static void deinit() {
@@ -441,6 +489,16 @@ static void deinit() {
   tick_timer_service_unsubscribe();
   battery_state_service_unsubscribe();
   connection_service_unsubscribe();
+  //save bluetooth, battery, phone battery, and steps
+  time_t currentTimestamp;
+  time(&currentTimestamp);
+
+  persist_write_data(KEY_SAVEDATE, (void*)&currentTimestamp, sizeof(currentTimestamp));
+  persist_write_bool(KEY_BT, bluetooth_connected);
+  persist_write_int(KEY_BATT, watch_batt);
+  persist_write_int(KEY_PHONEBATT, phone_batt);
+  persist_write_int(KEY_STEPS, current_steps);
+  APP_LOG(APP_LOG_LEVEL_ERROR, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX De-Initialized %ld",currentTimestamp);
 }
 
 int main(void) {
