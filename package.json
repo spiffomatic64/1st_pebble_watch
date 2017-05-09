@@ -5,14 +5,14 @@
         "pebble-dash-api": "^1.7.0"
     },
     "keywords": [],
-    "name": "pebbleeye-007",
+    "name": "double0spiff",
     "pebble": {
         "capabilities": [
             "location",
             "configurable",
             "health"
         ],
-        "displayName": "PebbleEye 007",
+        "displayName": "Double 0 Spiff",
         "enableMultiJS": true,
         "messageKeys": [
             "Bluetooth",
