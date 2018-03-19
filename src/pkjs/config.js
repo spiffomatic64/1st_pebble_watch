@@ -5,7 +5,7 @@ module.exports = [
   },
   {
     "type": "text",
-    "defaultValue": "Here is some introductory text."
+    "defaultValue": "TEST!"
   },
   {
     "type": "section",
@@ -25,6 +25,11 @@ module.exports = [
         "messageKey": "Animations",
         "label": "Enable Animations",
         "defaultValue": false
+      },
+      {
+      "type": "input",
+      "messageKey": "forecastio",
+      "label": "DarkSky Api Key"
       }
     ]
   },
