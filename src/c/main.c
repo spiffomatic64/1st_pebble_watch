@@ -74,10 +74,7 @@ static void init() {
   dash_api_init(APP_NAME, error_callback);
   events_app_message_open();
   
-  // Register with bluetooth service
-  connection_service_subscribe((ConnectionHandlers) {
-    .pebble_app_connection_handler = bluetooth_handler
-  });
+  bt_init();
   
   // Register with TickTimerService
   tick_timer_service_subscribe(MINUTE_UNIT, min_handler);

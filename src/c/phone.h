@@ -1,6 +1,6 @@
 #pragma once
 
-static void updatePhoneBatt( int level );
+void updatePhoneBatt( int level );
 
 static void get_callback(DataType type, DataValue result);
 
